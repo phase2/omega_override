@@ -1,0 +1,33 @@
+<?php
+/*
+ * Implementation of hook_form_alter()
+ * We are overriding the theme settings form to disable the validation
+ * check to see if the sum of the columns in the regions exceeds the total allowed
+ */
+function omega_override_form_alter(&$form, &$form_state, $form_id) {
+  switch ($form_id) {
+    case 'system_theme_settings':
+    case 'delta_ui_layout_configure':
+      foreach(element_children($form['alpha_settings']['structure']) as $section) {
+        foreach(element_children($form['alpha_settings']['structure'][$section]) as $zone) {
+          if(isset($form['alpha_settings']['structure'][$section][$zone]['zone']['alpha_zone_' . $zone . '_primary'])) {
+            $form['alpha_settings']['structure'][$section][$zone]['zone']['alpha_zone_' . $zone . '_primary']['#element_validate'] = array('alpha_theme_settings_validate_not_empty', 'omega_override_settings_validate_primary');
+          }
+        }
+      }
+    break;
+  }
+}
+
+/**
+ * Form element validation handler for validating the primary region setting for zones.
+ */
+function omega_override_settings_validate_primary(&$element, &$form_state) {
+  if ($element['#value'] != '_none') {
+    $values = $form_state['values'];
+    
+    if ($values['alpha_region_' . $element['#value'] . '_zone'] != $element['#zone']) {
+      form_set_value($element, NULL, $form_state);
+    }
+  }
+}

@@ -1,0 +1,3 @@
+name = Omega Override
+core = 7.x
+description = This module disables the Omega zone's 'summed region width' validation.
